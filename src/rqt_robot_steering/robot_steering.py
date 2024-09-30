@@ -32,6 +32,7 @@ import os
 
 from ament_index_python import get_resource
 from geometry_msgs.msg import Twist
+from std_msgs.msg import Float64
 from python_qt_binding import loadUi
 from python_qt_binding.QtCore import Qt, QTimer, Slot
 from python_qt_binding.QtGui import QKeySequence
@@ -180,7 +181,7 @@ class RobotSteering(Plugin):
         self._unregister_publisher()
         if topic == '':
             return
-        self._publisher = self._node.create_publisher(Twist, topic, qos_profile=QoSProfile(depth=10))
+        self._publisher = self._node.create_publisher(Float64, topic, qos_profile=QoSProfile(depth=10))
 
     def _on_stop_pressed(self):
         # If the current value of sliders is zero directly send stop twist msg
@@ -264,13 +265,8 @@ class RobotSteering(Plugin):
     def _send_twist(self, x_linear, z_angular):
         if self._publisher is None:
             return
-        twist = Twist()
-        twist.linear.x = x_linear
-        twist.linear.y = 0.0
-        twist.linear.z = 0.0
-        twist.angular.x = 0.0
-        twist.angular.y = 0.0
-        twist.angular.z = z_angular
+        twist = Float64()
+        twist.data = x_linear
 
         # Only send the zero command once so other devices can take control
         if x_linear == 0.0 and z_angular == 0.0:
